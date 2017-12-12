@@ -1,0 +1,9 @@
+.main-table td {
+    width: 200px;
+    height: 30px;
+    border: solid 1px #000000;
+}
+
+.main-table td.selected {
+    background-color: seagreen;
+}
