@@ -1,9 +1,16 @@
+.main-table {
+    border-collapse: collapse;
+}
+
 .main-table td {
     width: 200px;
     height: 30px;
-    border: solid 1px #000000;
+    border: solid 1px #a6a6a6;
 }
 
-.main-table td.selected {
-    background-color: seagreen;
+.selection {
+    /* 事件穿透 */
+    pointer-events: none;
+    position: absolute;
+    border: 1px solid #0882cf;
 }

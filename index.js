@@ -11,7 +11,6 @@ renderTable(table);
 
 mousedown$
     .subscribe(e => {
-        table.querySelectorAll('td').forEach(cell => {cell.className = '';});
         dragDrop$
             .scan((acc, e) => {
                 const pos = getPosition(e.target);
@@ -26,20 +25,21 @@ mousedown$
                 const startColumn = Math.min(range.startColumn, range.endColumn);
                 const endRow = Math.max(range.startRow, range.endRow);
                 const endColumn = Math.max(range.startColumn, range.endColumn);
-                table.querySelectorAll('td').forEach(cell => {cell.className = '';});
-                for (let i = startRow; i < endRow + 1; i++) {
-                    for (let j = startColumn; j < endColumn + 1; j++) {
-                        document.getElementById(`cell-${i}-${j}`).className = 'selected';
-                    }
-                }
+                const { top, left } = document.getElementById(`cell-${startRow}-${startColumn}`).getBoundingClientRect();
+                const { bottom, right } = document.getElementById(`cell-${endRow}-${endColumn}`).getBoundingClientRect();
+                const selectionEl = document.getElementById('selection');
+                selectionEl.style.top = `${top - 2}px`;
+                selectionEl.style.left = `${left - 2}px`;
+                selectionEl.style.height = `${bottom - top + 3}px`;
+                selectionEl.style.width = `${right - left + 3}px`;
             });
     });
 
 
 
 function renderTable(table) {
-    const column = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];;
-    const row = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const column = Array(10).fill(1).map((n, i) => i + 1);
+    const row = Array(20).fill(1).map((n, i) => i + 1);
     const frag = document.createDocumentFragment();
     
     row.forEach(i => {
