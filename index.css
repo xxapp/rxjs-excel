@@ -14,3 +14,9 @@
     position: absolute;
     border: 1px solid #0882cf;
 }
+
+.cell-input {
+    border: none;
+    outline: none;
+    width: 90%;
+}
