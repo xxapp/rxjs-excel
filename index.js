@@ -6,6 +6,8 @@ const mousedown$ = Rx.Observable.fromEvent(table, 'mousedown').filter(e => e.tar
 const mousemove$ = Rx.Observable.fromEvent(document, 'mousemove').filter(e => e.target.nodeName === 'TD');
 const mouseup$ = Rx.Observable.fromEvent(document, 'mouseup');
 const click$ = Rx.Observable.fromEvent(table, 'click').filter(e => e.target.nodeName === 'TD');
+const blur$ = Rx.Observable.fromEvent(cellInput, 'blur');
+const keyDown$ = Rx.Observable.fromEvent(table, 'keydown').filter(e => e.target.nodeName === 'TD');
 
 renderTable(table);
 
@@ -31,13 +33,23 @@ const doubleClick$ = click$
     .map(([e]) => e);
 
 dragDrop$.subscribe(renderSelection);
-doubleClick$.subscribe((e) => {
+doubleClick$.merge(keyDown$).subscribe(renderInput);
+blur$.subscribe(changeInputState);
+
+function changeInputState(e) {
+    const textNode = document.createTextNode(e.target.value);
+    e.target.style.display = 'none';
+    e.target.parentNode.insertBefore(textNode, e.target);
+}
+
+function renderInput(e) {
+    const text = e.target.textContent;
+    e.target.textContent = '';
     e.target.appendChild(cellInput);
     cellInput.style.removeProperty('display');
-    cellInput.setAttribute('value', '');
-    cellInput.style.outline = 'none';
+    cellInput.value = text;
     cellInput.focus();
-});
+}
 
 function renderSelection(range) {
     const startRow = Math.min(range.startRow, range.endRow);
@@ -67,6 +79,7 @@ function renderTable(table) {
             td.id = `cell-${i}-${j}`;
             td.setAttribute('data-row', i);
             td.setAttribute('data-column', j);
+            td.setAttribute('tabindex', 0);
             tr.appendChild(td);
         });
         frag.appendChild(tr);
