@@ -1,7 +1,10 @@
 const Rx = require('rxjs');
+const io = require('socket.io-client/dist/socket.io.js');
+const socket = io();
 
 const table = document.getElementById('main_table');
 const cellInput = document.getElementById('cell_input');
+const board = document.getElementById('board');
 const mousedown$ = Rx.Observable.fromEvent(table, 'mousedown').filter(e => e.target.nodeName === 'TD');
 const mousemove$ = Rx.Observable.fromEvent(document, 'mousemove').filter(e => e.target.nodeName === 'TD');
 const mouseup$ = Rx.Observable.fromEvent(document, 'mouseup');
@@ -10,6 +13,13 @@ const blur$ = Rx.Observable.fromEvent(cellInput, 'blur');
 const keyDown$ = Rx.Observable.fromEvent(table, 'keydown').filter(e => e.target.nodeName === 'TD');
 
 renderTable(table);
+
+socket.on('sync', (cell) => {
+    document.getElementById(`cell-${cell.row}-${cell.column}`).textContent = cell.value;
+});
+socket.on('uid', (uid) => {
+    board.textContent = `当前${uid}名用户正在编辑`;
+});
 
 const dragDrop$ = mousedown$
     .map(e => {
@@ -38,8 +48,11 @@ blur$.subscribe(changeInputState);
 
 function changeInputState(e) {
     const textNode = document.createTextNode(e.target.value);
+    const parentNode = e.target.parentNode;
+    const pos = getPosition(parentNode);
     e.target.style.display = 'none';
-    e.target.parentNode.insertBefore(textNode, e.target);
+    parentNode.insertBefore(textNode, e.target);
+    socket.emit('edit', Object.assign(pos, { value: e.target.value }));
 }
 
 function renderInput(e) {

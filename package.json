@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "i": "npm i --registry=https://registry.npm.taobao.org",
-    "start": "parcel index.html"
+    "start": "parcel watch index.html"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/xxapp/rxjs-excel#readme",
   "dependencies": {
-    "rxjs": "^5.5.5"
+    "express": "^4.16.2",
+    "rxjs": "^5.5.5",
+    "socket.io": "^2.0.4"
   }
 }
