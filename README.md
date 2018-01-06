@@ -1,5 +1,7 @@
 # rxjs-excel
 
+![demo](./rxjs-excel.gif)
+
 ## Start
 
 ```bash
