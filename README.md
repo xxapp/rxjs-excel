@@ -7,7 +7,7 @@
 ```bash
 git clone https://github.com/xxapp/rxjs-excel.git
 cd rxjs-excel
-npm install -g pracel
+npm install -g parcel
 npm install
 npm start
 
