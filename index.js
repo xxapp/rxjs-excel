@@ -105,7 +105,8 @@ function renderSelection(range) {
     const {startRow, startColumn, endRow, endColumn} = range;
     const { top, left } = document.getElementById(`cell-${startRow}-${startColumn}`).getBoundingClientRect();
     const { bottom, right } = document.getElementById(`cell-${endRow}-${endColumn}`).getBoundingClientRect();
-    const { scrollTop, scrollLeft } = document.documentElement;
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    const scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
     const selectionEl = document.getElementById('selection');
     selectionEl.style.top = `${top + scrollTop - 2}px`;
     selectionEl.style.left = `${left + scrollLeft - 2}px`;
