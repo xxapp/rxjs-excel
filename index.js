@@ -9,30 +9,29 @@ const mousedown$ = Rx.Observable.fromEvent(table, 'mousedown').filter(e => e.tar
 const mousemove$ = Rx.Observable.fromEvent(document, 'mousemove').filter(e => e.target.nodeName === 'TD');
 const mouseup$ = Rx.Observable.fromEvent(document, 'mouseup');
 const click$ = Rx.Observable.fromEvent(table, 'click').filter(e => e.target.nodeName === 'TD');
-const change$ = Rx.Observable.fromEvent(cellInput, 'change');
+const change$ = Rx.Observable.fromEvent(cellInput, 'blur');
 const keyDown$ = Rx.Observable.fromEvent(table, 'keydown').filter(e => e.target.nodeName === 'TD');
 
-const data = Array(20).fill(false).map(() => Array(10).fill(false));
-const tableFrame$ = Rx.Observable.of(data);
+const ROW_COUNT = 20, COLUMN_COUNT = 10;
+const data = Array(ROW_COUNT).fill(false).map(() => Array(COLUMN_COUNT).fill(false));
+const tableFrame$ = Rx.Observable.of([ROW_COUNT, COLUMN_COUNT]);
 
 const dataSync$ = Rx.Observable.fromEvent(socket, 'sync');
 const uidChange$ = Rx.Observable.fromEvent(socket, 'uid');
 
 const selection$ = mousedown$
-    .map(e => {
-        return Rx.Observable.of(e).switchMap(() => mousemove$.takeUntil(mouseup$))
-            .startWith(e)
-            .map(e => getPosition(e.target))
-            .distinctUntilChanged((p, q) => isPositionEqual(p, q))
-            .scan((acc, pos) => {
-                if (!acc) {
-                    return { startRow: pos.row, startColumn: pos.column, endRow: pos.row, endColumn: pos.column };
-                } else {
-                    return Object.assign(acc, { endRow: pos.row, endColumn: pos.column });
-                }
-            }, null);
-    })
-    .mergeAll()
+    .switchMap((e) => mousemove$
+        .takeUntil(mouseup$)
+        .map(e => getPosition(e.target))
+        .distinctUntilChanged((p, q) => isPositionEqual(p, q))
+        .scan((acc, pos) => {
+            if (!acc) {
+                return { startRow: pos.row, startColumn: pos.column, endRow: pos.row, endColumn: pos.column };
+            } else {
+                return Object.assign(acc, { endRow: pos.row, endColumn: pos.column });
+            }
+        }, null)
+    )
     .map((range) => {
         return {
             startRow: Math.min(range.startRow, range.endRow),
@@ -114,14 +113,14 @@ function renderSelection(range) {
     selectionEl.style.width = `${right - left + 3}px`;
 }
 
-function renderTable(data) {
+function renderTable([rowCount, columnCount]) {
     const frag = document.createDocumentFragment();
     
-    data.forEach((columns, i) => {
+    for (let i = 0; i < rowCount; i++) {
         const rowIndex = i + 1;
         const tr = document.createElement('tr');
         tr.id = 'row-' + rowIndex;
-        columns.forEach((cell, j) => {
+        for (let j = 0; j < columnCount; j++) {
             const columnIndex = j + 1;
             const td = document.createElement('td');
             td.id = `cell-${rowIndex}-${columnIndex}`;
@@ -130,9 +129,9 @@ function renderTable(data) {
             td.setAttribute('tabindex', 0);
             td.appendChild(document.createElement('span'));
             tr.appendChild(td);
-        });
+        }
         frag.appendChild(tr);
-    });
+    }
     table.innerHTML = '';
     table.appendChild(frag);
 }
