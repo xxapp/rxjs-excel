@@ -21,6 +21,7 @@ const uidChange$ = Rx.Observable.fromEvent(socket, 'uid');
 
 const selection$ = mousedown$
     .switchMap((e) => mousemove$
+        .startWith(e)
         .takeUntil(mouseup$)
         .map(e => getPosition(e.target))
         .distinctUntilChanged((p, q) => isPositionEqual(p, q))
