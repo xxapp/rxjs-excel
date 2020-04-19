@@ -2,6 +2,10 @@
 
 ![demo](./rxjs-excel.gif)
 
+## Other implementations
+
+* [react](https://github.com/xxapp/rxjs-excel-react)
+
 ## Start
 
 ```bash
